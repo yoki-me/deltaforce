@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三角洲行动</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #00d4aa; --primary-dark: #00a884;
+            --bg-dark: #0c1119; --bg-page: #101720; --bg-card: #161e28;
+            --bg-nav: rgba(12, 17, 25, 0.97);
+            --text-primary: #e8e8e8; --text-secondary: #94a3b8;
+            --border-color: #1e2d3d;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans SC', 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark); color: var(--text-primary);
+            overflow-x: hidden; line-height: 1.6; min-height: 100vh;
+        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-dark); border-radius: 3px; }
+
+        /* 导航栏 */
+        .navbar {
+            background: var(--bg-nav) !important; backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 212, 170, 0.12);
+            padding: 0 20px; z-index: 1050; box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
+        .navbar-brand img { height: 40px; width: auto; }
+        .brand-text {
+            font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.4rem;
+            letter-spacing: 3px; color: var(--primary);
+        }
+        .navbar-nav .nav-link {
+            color: var(--text-secondary) !important; font-size: 0.9rem; font-weight: 500;
+            letter-spacing: 1px; padding: 0.6rem 1.1rem !important;
+            cursor: pointer; transition: var(--transition); border-bottom: 2px solid transparent;
+        }
+        .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
+            color: var(--primary) !important; border-bottom-color: var(--primary);
+        }
+        .nav-login-btn {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: #000 !important; border: none !important; padding: 0.5rem 1.6rem !important;
+            border-radius: 4px !important; font-weight: 600 !important; letter-spacing: 2px !important;
+            cursor: pointer; transition: var(--transition);
+        }
+        .nav-login-btn:hover { box-shadow: 0 0 20px rgba(0,212,170,0.4); transform: translateY(-1px); }
+        .navbar-toggler { border: 1px solid rgba(255,255,255,0.15) !important; }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 212, 170, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+        }
+
+        /* 页面容器 */
+        .page-container { padding-top: 70px; min-height: 100vh; background: var(--bg-dark); }
+        .page-enter-active, .page-leave-active { transition: opacity 0.35s ease, transform 0.35s ease; }
+        .page-enter-from { opacity: 0; transform: translateY(18px); }
+        .page-leave-to { opacity: 0; transform: translateY(-12px); }
+
+        /* 通用 */
+        .section-tag {
+            display: inline-block; color: var(--primary); font-size: 0.78rem;
+            letter-spacing: 4px; text-transform: uppercase;
+            border: 1px solid rgba(0, 212, 170, 0.25); padding: 5px 18px; margin-bottom: 12px;
+        }
+        .section-heading {
+            font-family: 'Rajdhani', sans-serif; font-size: 2.6rem; font-weight: 700;
+            letter-spacing: 3px; color: #fff; margin-bottom: 6px;
+        }
+        .section-subtitle { color: var(--text-secondary); font-size: 0.95rem; letter-spacing: 1px; }
+
+        /* 首页 */
+        .home-hero {
+            position: relative; min-height: calc(100vh - 70px);
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-dark); overflow: hidden;
+        }
+        .home-hero-bg { position: absolute; inset: 0; opacity: 0.4; pointer-events: none; }
+        .home-hero-bg img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); }
+        .home-hero-content { position: relative; z-index: 1; text-align: center; padding: 40px 20px; }
+        .home-logo {
+            width: 80px; height: 80px; object-fit: contain; margin-bottom: 24px;
+            filter: drop-shadow(0 0 20px rgba(0,212,170,0.3));
+        }
+        .home-title {
+            font-family: 'Rajdhani', sans-serif; font-size: 5rem; font-weight: 700;
+            letter-spacing: 10px; line-height: 1.1;
+            background: linear-gradient(180deg, #fff 0%, #00d4aa 60%, #008866 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 8px;
+        }
+        .home-subtitle { font-size: 1.1rem; color: var(--text-secondary); letter-spacing: 5px; margin-bottom: 32px; }
+        .home-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary-action {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: #000; border: none; padding: 13px 36px; font-size: 0.95rem;
+            font-weight: 700; letter-spacing: 3px; border-radius: 4px;
+            cursor: pointer; transition: var(--transition); text-decoration: none; display: inline-block;
+        }
+        .btn-primary-action:hover { box-shadow: 0 0 30px rgba(0,212,170,0.5); transform: translateY(-2px); color: #000; }
+        .btn-outline-action {
+            background: transparent; color: var(--primary); border: 2px solid var(--primary);
+            padding: 11px 34px; font-size: 0.95rem; font-weight: 600; letter-spacing: 3px;
+            border-radius: 4px; cursor: pointer; transition: var(--transition); text-decoration: none; display: inline-block;
+        }
+        .btn-outline-action:hover { background: rgba(0,212,170,0.08); box-shadow: 0 0 20px rgba(0,212,170,0.2); color: var(--primary); }
+
+        /* 首页游戏介绍区 */
+        .home-intro {
+            padding: 80px 0; background: var(--bg-page); border-top: 1px solid var(--border-color);
+        }
+        .home-intro-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 40px; max-width: 900px; margin: 0 auto;
+            position: relative; overflow: hidden;
+        }
+        .home-intro-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--primary), transparent);
+        }
+        .home-intro-card p {
+            color: var(--text-secondary); font-size: 1.05rem; line-height: 2;
+            text-indent: 2em; margin: 0;
+        }
+
+        /* 游戏介绍页 - 模式卡片 */
+        .gameplay-hero {
+            background: linear-gradient(180deg, rgba(0,212,170,0.04) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-color); padding: 60px 0; text-align: center;
+        }
+        .mode-select-card {
+            background: var(--bg-card); border: 2px solid var(--border-color);
+            border-radius: 12px; padding: 40px 30px; text-align: center;
+            cursor: pointer; transition: var(--transition); height: 100%;
+            position: relative; overflow: hidden;
+        }
+        .mode-select-card:hover {
+            border-color: var(--primary); transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .mode-select-card.mode-fenghuo:hover { border-color: #ff8c42; }
+        .mode-select-card.mode-fenghuo:hover .mode-icon { color: #ff8c42; }
+        .mode-select-card.mode-zhanchang:hover { border-color: #42a5f5; }
+        .mode-select-card.mode-zhanchang:hover .mode-icon { color: #42a5f5; }
+        .mode-icon { font-size: 4.5rem; margin-bottom: 12px; transition: var(--transition); color: var(--primary); }
+        .mode-name {
+            font-family: 'Rajdhani', sans-serif; font-size: 2rem; font-weight: 700;
+            letter-spacing: 3px; color: #fff; margin-bottom: 6px;
+        }
+        .mode-brief { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin-top: 10px; }
+
+        /* 游戏介绍 - 详情视图 */
+        .mode-detail-section {
+            padding: 60px 0; border-top: 1px solid var(--border-color);
+        }
+        .mode-detail-header {
+            text-align: center; margin-bottom: 40px;
+        }
+        .mode-detail-header .mode-detail-icon { font-size: 4rem; margin-bottom: 10px; }
+        .mode-detail-header h3 {
+            font-family: 'Rajdhani', sans-serif; font-size: 2.2rem; font-weight: 700;
+            letter-spacing: 3px; color: #fff;
+        }
+        .mode-detail-header p {
+            color: var(--text-secondary); max-width: 700px; margin: 12px auto 0; line-height: 1.8;
+        }
+        .map-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .map-gallery-item {
+            border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);
+            transition: var(--transition); cursor: pointer;
+        }
+        .map-gallery-item:hover { border-color: var(--primary); transform: scale(1.02); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .map-gallery-item img { width: 100%; height: 200px; object-fit: cover; display: block; }
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px; color: var(--primary);
+            cursor: pointer; font-size: 0.9rem; letter-spacing: 2px;
+            transition: var(--transition); margin-bottom: 30px; text-decoration: none;
+        }
+        .back-btn:hover { color: #fff; }
+
+        /* 角色介绍 */
+        .characters-hero {
+            background: linear-gradient(180deg, rgba(0,212,170,0.04) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-color); padding: 60px 0; text-align: center;
+        }
+        .class-filter-bar { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; }
+        .class-filter-btn {
+            background: transparent; border: 1px solid var(--border-color);
+            color: var(--text-secondary); padding: 10px 28px; font-size: 0.88rem;
+            letter-spacing: 2px; cursor: pointer; transition: var(--transition);
+            border-radius: 4px; font-weight: 500;
+        }
+        .class-filter-btn:hover, .class-filter-btn.active {
+            border-color: var(--primary); color: var(--primary); background: rgba(0,212,170,0.06);
+        }
+        .operator-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 8px; overflow: hidden; transition: var(--transition); height: 100%;
+        }
+        .operator-card:hover { border-color: var(--primary); transform: translateY(-6px); box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+        .operator-img-wrap { height: 340px; overflow: hidden; position: relative; background: var(--bg-dark); }
+        .operator-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .operator-card:hover .operator-img-wrap img { transform: scale(1.05); }
+        .operator-img-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
+            background: linear-gradient(transparent, rgba(12,17,25,0.95)); pointer-events: none;
+        }
+        .operator-img-badge {
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(0,0,0,0.7); border: 1px solid var(--primary);
+            color: var(--primary); padding: 4px 14px; font-size: 0.72rem;
+            letter-spacing: 2px; z-index: 2; border-radius: 2px;
+        }
+        .operator-info { padding: 20px; }
+        .operator-realname { font-size: 0.8rem; color: var(--text-secondary); letter-spacing: 1px; margin-bottom: 2px; }
+        .operator-codename { font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 700; letter-spacing: 3px; color: #fff; margin-bottom: 2px; }
+        .operator-class-label { font-size: 0.72rem; letter-spacing: 3px; color: var(--primary); margin-bottom: 10px; text-transform: uppercase; }
+        .operator-desc-short { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; }
+
+
+        /* 游戏评价 */
+        .reviews-hero {
+            background: linear-gradient(180deg, rgba(0,212,170,0.04) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-color); padding: 60px 0; text-align: center;
+        }
+        .review-text-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 40px; max-width: 900px; margin: 0 auto 40px;
+            position: relative; overflow: hidden;
+        }
+        .review-text-card::before {
+            content: '"'; position: absolute; top: -20px; left: 20px;
+            font-size: 8rem; color: rgba(0,212,170,0.06); font-family: serif; line-height: 1;
+        }
+        .review-text-card p {
+            color: var(--text-secondary); font-size: 1.05rem; line-height: 2; text-indent: 2em; margin: 0;
+            position: relative; z-index: 1;
+        }
+        .review-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+        .review-gallery-item {
+            border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .review-gallery-item:hover { border-color: var(--primary); transform: scale(1.02); }
+        .review-gallery-item img { width: 100%; height: 220px; object-fit: cover; display: block; }
+
+        /* 页脚 */
+        .site-footer {
+            background: #080c12; border-top: 1px solid var(--border-color);
+            padding: 40px 0 20px; color: var(--text-secondary); font-size: 0.85rem; text-align: center;
+        }
+        .site-footer .footer-brand {
+            font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.2rem;
+            letter-spacing: 3px; color: #fff; margin-bottom: 8px;
+        }
+        .site-footer .footer-links {
+            list-style: none; padding: 0; display: flex;
+            justify-content: center; gap: 24px; flex-wrap: wrap; margin: 12px 0;
+        }
+        .site-footer .footer-links a {
+            color: var(--text-secondary); text-decoration: none; cursor: pointer;
+            transition: var(--transition); font-size: 0.85rem; letter-spacing: 1px;
+        }
+        .site-footer .footer-links a:hover { color: var(--primary); }
+        .site-footer .footer-divider { width: 60px; height: 1px; background: var(--border-color); margin: 16px auto; }
+
+        /* 登录模态框 */
+        .modal-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; }
+        .modal-header { border-bottom: 1px solid var(--border-color); }
+        .modal-header .modal-title { font-family: 'Rajdhani', sans-serif; letter-spacing: 3px; color: #fff; }
+        .modal-header .btn-close { filter: invert(1); }
+        .modal-footer { border-top: 1px solid var(--border-color); }
+        .form-control {
+            background: #0c1119; border: 1px solid var(--border-color); color: #fff;
+            border-radius: 4px; padding: 10px 15px;
+        }
+        .form-control:focus { background: #0c1119; border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(0,212,170,0.12); color: #fff; }
+        .form-control::placeholder { color: #4a5568; }
+        .input-group-text { background: #0c1119; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: #000; border: none; padding: 10px 30px; font-weight: 600;
+            letter-spacing: 2px; transition: var(--transition);
+        }
+        .btn-submit:hover { box-shadow: 0 0 20px rgba(0,212,170,0.4); color: #000; }
+        .custom-toast {
+            position: fixed; top: 80px; right: 24px; z-index: 9999;
+            background: var(--bg-card); border: 1px solid var(--primary);
+            color: #fff; padding: 14px 24px; border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none;
+        }
+
+        /* 响应式 */
+        @media (max-width: 991px) {
+            .home-title { font-size: 3rem; letter-spacing: 5px; }
+            .section-heading { font-size: 1.8rem; }
+            .navbar-collapse { background: var(--bg-nav); padding: 16px; backdrop-filter: blur(15px); }
+            .operator-img-wrap { height: 260px; }
+            .map-gallery { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        }
+        @media (max-width: 576px) {
+            .home-title { font-size: 2rem; letter-spacing: 2px; }
+            .home-subtitle { font-size: 0.8rem; letter-spacing: 2px; }
+            .home-buttons { flex-direction: column; align-items: center; }
+            .section-heading { font-size: 1.5rem; letter-spacing: 1px; }
+            .navbar-brand img { height: 32px; }
+            .brand-text { font-size: 1.1rem; }
+            .home-intro-card { padding: 24px; }
+            .home-intro-card p { font-size: 0.9rem; }
+            .mode-select-card { padding: 24px 18px; }
+            .mode-name { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+
+        <!-- ========== 导航栏 ========== -->
+        <nav class="navbar navbar-expand-lg fixed-top">
+            <div class="container">
+                <a class="navbar-brand" @click.prevent="navigate('home')">
+                    <img src="logo.webp" alt="Logo" onerror="this.style.display='none'">
+                    <span class="brand-text">三角洲行动</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
+                        <li class="nav-item">
+                            <a class="nav-link" :class="{ active: currentPage === 'home' }" @click.prevent="navigate('home')">
+                                <i class="bi bi-house-door me-1"></i> 首页
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" :class="{ active: currentPage === 'gameplay' }" @click.prevent="navigate('gameplay')">
+                                <i class="bi bi-controller me-1"></i> 游戏介绍
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" :class="{ active: currentPage === 'characters' }" @click.prevent="navigate('characters')">
+                                <i class="bi bi-people me-1"></i> 角色介绍
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" :class="{ active: currentPage === 'reviews' }" @click.prevent="navigate('reviews')">
+                                <i class="bi bi-star me-1"></i> 游戏评价
+                            </a>
+                        </li>
+                        <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                            <a class="nav-link nav-login-btn text-center" @click.prevent="openLoginModal">
+                                <i class="bi bi-person-fill me-1"></i> 在线登录
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ========== 页面内容 ========== -->
+        <div class="page-container">
+            <transition name="page" mode="out-in">
+
+                <!-- ==================== 首页 ==================== -->
+                <div v-if="currentPage === 'home'" key="home">
+                    <!-- Hero -->
+                    <section class="home-hero">
+                        <div class="home-hero-bg">
+                            <img src="1.png" alt="bg" onerror="this.parentElement.style.display='none'">
+                        </div>
+                        <div class="home-hero-content">
+                            <h1 class="home-title">三角洲行动</h1>
+                            <p class="home-subtitle">战术射击 · 使命必达</p>
+                            <div class="home-buttons">
+                                <a class="btn-primary-action" @click.prevent="navigate('gameplay')">
+                                    <i class="bi bi-controller me-2"></i>了解玩法
+                                </a>
+                                <a class="btn-outline-action" @click.prevent="navigate('characters')">
+                                    <i class="bi bi-people me-2"></i>查看干员
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 游戏介绍文字 -->
+                    <section class="home-intro">
+                        <div class="container">
+                            <div class="home-intro-card">
+                                <p>《三角洲行动》是一款多端互通的战术射击游戏，玩法类型丰富，涵盖搜打撤、大战场、剧情闯关、竞技场等多种模式，能满足不同玩家需求。游戏枪械改装系统深度十足，射击手感出色，且皮肤不影响对战平衡，零氪玩家也能正常体验。不过游戏入门门槛较高，规则复杂，新手容易亏损。同时存在优化不足、部分场景画质一般、外挂干扰、物资爆率和经济体系不够合理等问题。整体可玩性较强，适合喜爱硬核射击与战术博弈的玩家。</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- ==================== 游戏介绍页 ==================== -->
+                <div v-if="currentPage === 'gameplay'" key="gameplay">
+                    <!-- 模式选择 -->
+                    <section v-if="!selectedMode" class="gameplay-hero">
+                        <div class="container">
+                            <div class="section-tag">GAMEPLAY</div>
+                            <h2 class="section-heading">游戏介绍</h2>
+                            <p class="section-subtitle">三角洲行动提供两种截然不同的核心玩法，点击了解详情</p>
+                        </div>
+                    </section>
+
+                    <section v-if="!selectedMode" style="padding: 60px 0;">
+                        <div class="container">
+                            <div class="row g-4">
+                                <div class="col-lg-6">
+                                    <div class="mode-select-card mode-fenghuo" @click="selectedMode = 'fenghuo'">
+                                        <h3 class="mode-name">烽火地带</h3>
+                                        <p class="mode-brief">
+                                            支持1-3人组队，在地图中搜集物资、对抗人机与其他玩家。保险箱和曼德尔砖可产出稀有道具，物资需成功撤离才能带走。分为普通、机密和绝密三个难度。
+                                        </p>
+                                        <div style="margin-top:16px;">
+                                            <span style="color:#ff8c42; letter-spacing:2px; font-size:0.85rem; font-weight:600;">
+                                                点击查看详情 <i class="bi bi-arrow-right"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mode-select-card mode-zhanchang" @click="selectedMode = 'zhanchang'">
+                                        <h3 class="mode-name">全面战场</h3>
+                                        <p class="mode-brief">
+                                            大型团战模式，支持多人对战且可无限复活。分为据点攻防和积分占领两种玩法，可驾驶坦克、直升机等载具作战，搭配不同干员分工配合。
+                                        </p>
+                                        <div style="margin-top:16px;">
+                                            <span style="color:#42a5f5; letter-spacing:2px; font-size:0.85rem; font-weight:600;">
+                                                点击查看详情 <i class="bi bi-arrow-right"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 烽火地带详情 -->
+                    <section v-if="selectedMode === 'fenghuo'" class="mode-detail-section">
+                        <div class="container">
+                            <a class="back-btn" @click="selectedMode = null">
+                                <i class="bi bi-arrow-left"></i> 返回模式选择
+                            </a>
+                            <div class="mode-detail-header">
+                                <div class="mode-detail-icon">🔥</div>
+                                <h3>烽火地带</h3>
+                                <p>烽火地带是三角洲行动的核心玩法，支持1-3人组队。玩家在地图中搜集物资、对抗人机与其他玩家，保险箱和曼德尔砖可产出稀有道具。本局物资需成功撤离才能带走，阵亡或未能撤离，安全箱外物品将会全部丢失。模式分为三个难度：普通、机密和绝密，难度越高奖励与对战强度越高。</p>
+                            </div>
+                            <h5 style="color:#fff; letter-spacing:2px; margin-bottom:20px; text-align:center;">
+                                <i class="bi bi-map me-2" style="color:#ff8c42;"></i>游戏地图
+                            </h5>
+                            <div class="map-gallery">
+                                <div class="map-gallery-item">
+                                    <img src="烽火地带图片.png" alt="烽火地带地图" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="烽火地带1.jpg" alt="烽火地带地图1" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="烽火地带2.jpg" alt="烽火地带地图2" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="烽火地带3.jpg" alt="烽火地带地图3" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="烽火地带4.jpg" alt="烽火地带地图4" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="烽火都带5.jpg" alt="烽火地带地图5" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 全面战场详情 -->
+                    <section v-if="selectedMode === 'zhanchang'" class="mode-detail-section">
+                        <div class="container">
+                            <a class="back-btn" @click="selectedMode = null">
+                                <i class="bi bi-arrow-left"></i> 返回模式选择
+                            </a>
+                            <div class="mode-detail-header">
+                                <div class="mode-detail-icon">⚔️</div>
+                                <h3>全面战场</h3>
+                                <p>全面战场是《三角洲行动》的大型团战模式，支持多人对战且可无限复活。对局分为据点攻防和积分占领两种玩法，双方围绕据点展开激烈争夺。玩家不仅能使用各类枪械，还可驾驶坦克、直升机等载具作战，搭配不同干员分工配合。</p>
+                            </div>
+                            <h5 style="color:#fff; letter-spacing:2px; margin-bottom:20px; text-align:center;">
+                                <i class="bi bi-map me-2" style="color:#42a5f5;"></i>游戏地图
+                            </h5>
+                            <div class="map-gallery">
+                                <div class="map-gallery-item">
+                                    <img src="全面战场图片.jpg" alt="全面战场地图" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="全面战场1.jpg" alt="全面战场地图1" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="全面战场2.jpg" alt="全面战场地图2" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="全面战场3.jpg" alt="全面战场地图3" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="全面战场4.jpg" alt="全面战场地图4" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="map-gallery-item">
+                                    <img src="全面战场5.jpg" alt="全面战场地图5" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- ==================== 角色介绍页 ==================== -->
+                <div v-if="currentPage === 'characters'" key="characters" class="characters-page">
+                    <section class="characters-hero">
+                        <div class="container">
+                            <div class="section-tag">OPERATORS</div>
+                            <h2 class="section-heading">角色介绍</h2>
+                            <p class="section-subtitle">四大兵种，十五位精英干员，选择你的战斗风格</p>
+                        </div>
+                    </section>
+
+                    <section style="padding: 60px 0;">
+                        <div class="container">
+                            <!-- 兵种筛选 -->
+                            <div class="class-filter-bar">
+                                <button class="class-filter-btn" :class="{ active: charFilter === 'all' }" @click="charFilter = 'all'">全部干员</button>
+                                <button class="class-filter-btn" :class="{ active: charFilter === 'assault' }" @click="charFilter = 'assault'"><i class="bi bi-shield-slash me-1"></i> 突击</button>
+                                <button class="class-filter-btn" :class="{ active: charFilter === 'engineer' }" @click="charFilter = 'engineer'"><i class="bi bi-tools me-1"></i> 工程</button>
+                                <button class="class-filter-btn" :class="{ active: charFilter === 'medic' }" @click="charFilter = 'medic'"><i class="bi bi-heart-pulse me-1"></i> 医疗</button>
+                                <button class="class-filter-btn" :class="{ active: charFilter === 'recon' }" @click="charFilter = 'recon'"><i class="bi bi-eye me-1"></i> 侦察</button>
+                            </div>
+
+                            <!-- 干员卡片 -->
+                            <div class="row g-4">
+                                <div class="col-xl-3 col-lg-4 col-md-6" v-for="op in filteredOperators" :key="op.id">
+                                    <div class="operator-card">
+                                        <div class="operator-img-wrap">
+                                            <img :src="op.image" :alt="op.codename" @error="imgError($event, op.bgColor)">
+                                            <div class="operator-img-overlay"></div>
+                                            <span class="operator-img-badge">{{ op.classLabel }}</span>
+                                        </div>
+                                        <div class="operator-info">
+                                            <div class="operator-realname">{{ op.realName }}</div>
+                                            <h4 class="operator-codename">代号：{{ op.codename }}</h4>
+                                            <div class="operator-class-label">{{ op.roleTitle }}</div>
+                                            <p class="operator-desc-short">{{ op.shortDesc }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="filteredOperators.length === 0" class="text-center py-5">
+                                <i class="bi bi-search" style="font-size:3rem; color:var(--text-secondary);"></i>
+                                <p class="mt-3 text-muted">该分类下暂无干员数据</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- ==================== 游戏评价页 ==================== -->
+                <div v-if="currentPage === 'reviews'" key="reviews" class="reviews-page">
+                    <section class="reviews-hero">
+                        <div class="container">
+                            <div class="section-tag">REVIEWS</div>
+                            <h2 class="section-heading">游戏评价</h2>
+                        </div>
+                    </section>
+
+                    <section style="padding: 60px 0;">
+                        <div class="container">
+                            <!-- 评价文字 -->
+                            <div class="review-text-card">
+                                <p>《三角洲行动》作为一款多端互通的战术射击游戏，凭借丰富的玩法模式和深度的枪械改装系统，赢得了广大FPS玩家的青睐。无论是高风险高回报的"烽火地带"，还是大规模团队对抗的"全面战场"，都为玩家提供了极具沉浸感的现代战争体验。十五位特色鲜明的干员、精良的画面表现以及持续更新的赛季内容，让这款游戏在战术射击领域独树一帜。尽管存在入门门槛较高、优化仍需加强等问题，但其硬核的战术博弈和出色的射击手感，依然使其成为战术射击爱好者的不二之选。</p>
+                            </div>
+                            <!-- 游戏截图 -->
+                            <h5 style="color:#fff; letter-spacing:2px; margin-bottom:20px; text-align:center;">
+                                <i class="bi bi-images me-2" style="color:var(--primary);"></i>游戏截图
+                            </h5>
+                            <div class="review-gallery">
+                                <div class="review-gallery-item">
+                                    <img src="游戏截图1.jpg" alt="游戏截图1" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="review-gallery-item">
+                                    <img src="游戏截图2.jpg" alt="游戏截图2" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="review-gallery-item">
+                                    <img src="游戏图片3.jpg" alt="游戏截图3" onerror="this.parentElement.style.display='none'">
+                                </div>
+                                <div class="review-gallery-item">
+                                    <img src="游戏截图4.jpg" alt="游戏截图4" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+            </transition>
+        </div>
+
+        <!-- ========== 页脚 ========== -->
+        <footer class="site-footer">
+            <div class="container">
+                <div class="footer-brand">三角洲行动</div>
+                <ul class="footer-links">
+                    <li><a @click="navigate('home')">首页</a></li>
+                    <li><a @click="navigate('gameplay')">游戏介绍</a></li>
+                    <li><a @click="navigate('characters')">角色介绍</a></li>
+                    <li><a @click="navigate('reviews')">游戏评价</a></li>
+                    <li><a @click="openLoginModal">在线登录</a></li>
+                </ul>
+                
+                
+            </div>
+        </footer>
+
+        <!-- ========== 登录模态框 ========== -->
+        <div class="modal fade" id="loginModal" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-shield-lock me-2"></i>{{ isLoginMode ? '账号登录' : '账号注册' }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="d-flex mb-4">
+                            <button class="btn w-50" :class="isLoginMode ? 'btn-submit' : 'btn btn-outline-secondary'" @click="isLoginMode = true">登录</button>
+                            <button class="btn w-50" :class="!isLoginMode ? 'btn-submit' : 'btn btn-outline-secondary'" @click="isLoginMode = false">注册</button>
+                        </div>
+                        <form @submit.prevent="handleLogin">
+                            <div class="mb-3">
+                                <label class="form-label text-secondary">用户名 / 邮箱</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <input type="text" class="form-control" v-model="loginForm.username" placeholder="请输入用户名或邮箱" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-secondary">密码</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <input :type="showPassword ? 'text' : 'password'" class="form-control" v-model="loginForm.password" placeholder="请输入密码" required>
+                                    <span class="input-group-text" @click="showPassword = !showPassword" style="cursor:pointer;">
+                                        <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mb-3" v-if="!isLoginMode">
+                                <label class="form-label text-secondary">确认密码</label>
+                                <input type="password" class="form-control" v-model="loginForm.confirmPassword" placeholder="请再次输入密码" required>
+                            </div>
+                            <div class="mb-3 form-check" v-if="isLoginMode">
+                                <input type="checkbox" class="form-check-input" id="rememberMe" v-model="loginForm.remember">
+                                <label class="form-check-label text-secondary" for="rememberMe">记住登录状态</label>
+                                <a href="#" class="float-end text-decoration-none" style="color:var(--primary); font-size:0.85rem;" @click.prevent="showToast('密码重置功能即将上线')">忘记密码？</a>
+                            </div>
+                            <div class="mb-3 form-check" v-if="!isLoginMode">
+                                <input type="checkbox" class="form-check-input" id="agreeTerms" v-model="loginForm.agreeTerms" required>
+                                <label class="form-check-label text-secondary" for="agreeTerms">我已阅读并同意相关协议</label>
+                            </div>
+                            <button type="submit" class="btn btn-submit w-100 mt-3">
+                                <i :class="isLoginMode ? 'bi bi-box-arrow-in-right' : 'bi bi-person-plus'"></i>
+                                {{ isLoginMode ? '登 录' : '注 册' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== Toast ========== -->
+        <div class="custom-toast" id="customToast">
+            <i class="bi bi-check-circle-fill me-2" style="color:var(--primary);"></i>
+            <span id="toastMessage"></span>
+        </div>
+
+    </div>
+
+    <!-- ========== JS 库 ========== -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                // ======== 导航 ========
+                const currentPage = ref('home');
+                const selectedMode = ref(null); // null | 'fenghuo' | 'zhanchang'
+
+                const navigate = (page) => {
+                    currentPage.value = page;
+                    selectedMode.value = null;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const collapse = document.getElementById('navbarNav');
+                    const bsCollapse = bootstrap.Collapse.getInstance(collapse);
+                    if (bsCollapse) bsCollapse.hide();
+                };
+
+                // ======== 角色筛选 ========
+                const charFilter = ref('all');
+
+                // ======== 干员数据（基于干员介绍文件重写） ========
+                const operators = ref([
+                    // ---- 突击兵 ----
+                    {
+                        id: 1, realName: '王宇昊', codename: '威龙', classType: 'assault', classLabel: '突击',
+                        roleTitle: 'ASSAULT · 前线突破', classIcon: 'bi bi-shield-slash',
+                        shortDesc: '王宇昊所接受的训练与常规作战人员不同，他的身体素质、平衡能力和反应能力都是万里挑一，信念感和使命感更是G.T.I.重视他的原因。他独特的作战技能在战场上发挥关键作用，能让敌人瞬间伏倒，在控制敌人、打乱敌方阵营时效果显著。',
+                        longDesc: '王宇昊，代号"威龙"，是G.T.I.最重视的特战干员之一。他所接受的训练体系与常规作战人员截然不同——从体能到心理素质都经过了极限筛选。他的身体素质、平衡能力和反应速度都是万里挑一的存在。在战场上，威龙擅长利用自身优势对敌方阵线发起冲击，通过独特的控制技能让敌人瞬间失去战斗力，为队友创造突破机会。无论是烽火地带中的正面突破，还是全面战场中的阵型撕裂，威龙都是不可或缺的核心力量。"最好的防守就是进攻。"',
+                        abilities: [
+                            { name: '突破冲锋', desc: '短时间内大幅提升移动速度与近战伤害，可撞破轻型掩体，是突破防线的核心技能。' },
+                            { name: '破片手雷', desc: '投掷高爆手雷，对大范围内敌人造成致命伤害，适合清剿房间和掩体后的敌军。' },
+                            { name: '强化护甲', desc: '被动技能。威龙装备重型陶瓷防弹板，受到躯干伤害降低25%。' },
+                            { name: '火力压制', desc: '终极技能。进入压制状态，武器后坐力降低50%、射速提升30%，持续12秒。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 9, color: '#e74856' }, { key: '生存能力', val: 8, color: '#4a90d9' },
+                            { key: '机动性', val: 5, color: '#00d4aa' }, { key: '团队辅助', val: 3, color: '#d4a853' },
+                            { key: '上手难度', val: 3, color: '#a855f7' }, { key: '技能强度', val: 7, color: '#f59e0b' },
+                        ],
+                        tips: '威龙适合新手玩家快速上手。在烽火地带中，利用强化护甲率先进入危险区域搜索物资；在全面战场中，担任队伍前排，配合医疗兵的支援形成坚不可摧的防线。',
+                        image: '突击1.png', bgColor: 'linear-gradient(135deg, #2a1010, #1a0808)'
+                    },
+                    {
+                        id: 2, realName: '埃利·德·蒙贝尔', codename: '无名', classType: 'assault', classLabel: '突击',
+                        roleTitle: 'ASSAULT · 暗影突击', classIcon: 'bi bi-shield-slash',
+                        shortDesc: '曾接受过来自哈夫克的军事训练，也有丰富的佣兵经验，擅长信息干扰，精通多种战斗技巧。他是集单兵绕后、追踪伤害、闪光突破为一体的干员，对隐蔽突袭作战造诣极深，能在战场上出其不意地刺入敌方防御空缺。',
+                        longDesc: '埃利·德·蒙贝尔，代号"无名"，是一位身世如谜的独行战士。他曾接受过来自哈夫克的军事训练，积累了丰富的佣兵实战经验。无名擅长信息干扰与隐蔽渗透，精通多种战斗技巧，是集单兵绕后、追踪伤害和闪光突破为一体的全能型干员。他对隐蔽突袭作战的造诣极深，能够在战场形势最胶着的时候，出其不意地刺入敌方防御最为薄弱的区域。无名不信任任何人，但他对队友的忠诚毋庸置疑。"我不需要名字，我只需要任务目标。"',
+                        abilities: [
+                            { name: '幽灵潜行', desc: '激活后脚步声完全消失，移动时半透明化，持续8秒。攻击会打破潜行状态。' },
+                            { name: '近战处决', desc: '从背后接近敌人时触发特殊处决动画，处决后自动装填当前武器。' },
+                            { name: '烟雾弹幕', desc: '投掷多枚烟雾弹，形成大面积烟幕区，持续15秒。烟幕中的敌人视野受限60%。' },
+                            { name: '暗影突袭', desc: '终极技能。标记视野内所有敌人并瞬间传送到最近标记处，传送后3秒内伤害提升50%。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 10, color: '#e74856' }, { key: '生存能力', val: 4, color: '#4a90d9' },
+                            { key: '机动性', val: 8, color: '#00d4aa' }, { key: '团队辅助', val: 2, color: '#d4a853' },
+                            { key: '上手难度', val: 9, color: '#a855f7' }, { key: '技能强度', val: 8, color: '#f59e0b' },
+                        ],
+                        tips: '无名是高手向干员。在烽火地带中，利用潜行能力绕过敌人防线，专挑落单目标下手；在全面战场中，从侧翼渗透敌方后方，优先消灭敌方侦察兵和医疗兵，打乱敌方阵型。',
+                        image: '突击2.png', bgColor: 'linear-gradient(135deg, #1a1a2a, #0d0d1a)'
+                    },
+                    {
+                        id: 3, realName: '凯·席尔瓦', codename: '红狼', classType: 'assault', classLabel: '突击',
+                        roleTitle: 'ASSAULT · 狂暴先锋', classIcon: 'bi bi-shield-slash',
+                        shortDesc: '作战经验丰富，多次执行海外派驻任务。在北非的任务中负伤修养之后，正式被G.T.I.招募，成为G.T.I.研制的动力外骨骼系统的首个使用者。在战斗中，他像敏捷的猎豹一样，快速穿梭于战场各处，寻找合适的交战地点。',
+                        longDesc: '凯·席尔瓦，代号"红狼"，是一位作战经验极其丰富的老兵。他曾多次执行海外派驻任务，在北非的一次行动中身负重伤。康复期间，他被G.T.I.正式招募，并成为了G.T.I.研制的动力外骨骼系统的首位使用者。这套外骨骼系统赋予了他远超常人的机动能力——在战斗中，红狼如同敏捷的猎豹一般快速穿梭于战场各处，寻找最有利的交战位置并发起致命进攻。红狼的战斗风格如同他的代号一样凶猛无畏。"疼痛只是战斗的调味剂，而我从来不缺胃口。"',
+                        abilities: [
+                            { name: '狂暴状态', desc: '血量低于50%时自动触发，伤害提升20%、移动速度提升15%，持续到生命值恢复至50%以上。' },
+                            { name: '燃烧手雷', desc: '投掷特制燃烧弹，在目标区域制造持续10秒的火海，造成灼烧伤害并限制敌人移动。' },
+                            { name: '生命偷取', desc: '被动技能。每次击杀恢复最大生命值的15%，助攻恢复5%。' },
+                            { name: '血战到底', desc: '终极技能。10秒内免疫死亡（最低保留1HP），期间每击杀一名敌人额外延长2秒。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 9, color: '#e74856' }, { key: '生存能力', val: 9, color: '#4a90d9' },
+                            { key: '机动性', val: 6, color: '#00d4aa' }, { key: '团队辅助', val: 1, color: '#d4a853' },
+                            { key: '上手难度', val: 5, color: '#a855f7' }, { key: '技能强度', val: 9, color: '#f59e0b' },
+                        ],
+                        tips: '红狼的核心玩法是"以战养战"。在烽火地带中不要畏惧正面交战，利用生命偷取在战斗中持续回血；在全面战场中，选择敌人密集区域投放燃烧手雷，配合血战到底冲入敌阵大开杀戒。',
+                        image: '突击3.png', bgColor: 'linear-gradient(135deg, #2a0d0d, #1a0505)'
+                    },
+                    {
+                        id: 4, realName: '克莱尔·安·拜尔斯', codename: '疾风', classType: 'assault', classLabel: '突击',
+                        roleTitle: 'ASSAULT · 极速猎手', classIcon: 'bi bi-shield-slash',
+                        shortDesc: '集高机动移动、缴械突入为一体的突击型干员。她可以在交战中提升自己的移动与翻滚速度，并使用钻墙电钻缴械掩体后的敌人，在战斗时还可以在原地布置错点，进行闪回和自救，让敌人难以捕捉。',
+                        longDesc: '克莱尔·安·拜尔斯，代号"疾风"，是突击兵种中速度最快的干员。她将高机动移动与缴械突入完美结合，形成了独一无二的作战风格。在交战中，疾风可以不断提升自己的移动与翻滚速度，让敌人的瞄准难以跟上她的节奏。她标志性的钻墙电钻可以穿透掩体缴械藏匿的敌人，而错点闪回机制更是让她的行动轨迹变得难以预测——她可以在原地布置错点，在紧急时刻闪回并自救。疾风的战斗哲学简单明了："快不是目的，快到敌人反应不过来才是。"',
+                        abilities: [
+                            { name: '疾跑冲刺', desc: '冲刺速度提升40%，冲刺时可以开枪（精度降低30%），持续6秒，冷却15秒。' },
+                            { name: '闪避翻滚', desc: '向任意方向快速翻滚躲避，翻滚期间无敌帧0.3秒，可连续使用2次。' },
+                            { name: '弹射起步', desc: '被动技能。每次击杀后移动速度提升10%，持续5秒，最多叠加3层。' },
+                            { name: '暴风连击', desc: '终极技能。大幅提升射速与换弹速度，持续8秒。期间每命中一枪都刷新冲刺冷却。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 7, color: '#e74856' }, { key: '生存能力', val: 3, color: '#4a90d9' },
+                            { key: '机动性', val: 10, color: '#00d4aa' }, { key: '团队辅助', val: 4, color: '#d4a853' },
+                            { key: '上手难度', val: 7, color: '#a855f7' }, { key: '技能强度', val: 7, color: '#f59e0b' },
+                        ],
+                        tips: '疾风的上限极高但容错率低。在烽火地带中利用速度优势快速搜刮并抢先撤离；在全面战场中执行"打了就跑"的游击战术，不断骚扰敌方侧翼。切勿长时间原地交火——失去速度的疾风不堪一击。',
+                        image: '突击4.png', bgColor: 'linear-gradient(135deg, #0d2a0d, #051a05)'
+                    },
+
+                    // ---- 工程兵 ----
+                    {
+                        id: 5, realName: '拉希德·拉哈尔', codename: '比特', classType: 'engineer', classLabel: '工程',
+                        roleTitle: 'ENGINEER · 数字战专家', classIcon: 'bi bi-tools',
+                        shortDesc: '阿萨拉本土出身，曾服役于阿萨拉皇家防卫军，后成为顶尖机械工程师。他自主研发了标志性的哨兵蜘蛛"T仔"，擅长用机械造物巡逻、追踪并限制敌人，是战场上的技术专家与战术核心。',
+                        longDesc: '拉希德·拉哈尔，代号"比特"，是阿萨拉本土出身的顶尖机械工程师。他曾在阿萨拉皇家防卫军服役，积累了丰富的实战经验后转向机械研发领域。比特最引以为傲的杰作是他自主研发的哨兵蜘蛛"T仔"——一台集巡逻、追踪和火力打击于一体的智能机械造物。在战场上，比特通过操控"T仔"实现对敌方动向的持续监视和精准打击，是队伍中不可或缺的技术专家与战术核心。"在网络世界里，我就是神。"',
+                        abilities: [
+                            { name: '电子干扰', desc: '释放电磁脉冲，使范围内敌方电子设备失灵5秒，包括小地图、电子瞄具和无人机。' },
+                            { name: '侦察无人机', desc: '部署微型侦察无人机，持续飞行40秒，实时传回敌方位置信息并与全队共享。' },
+                            { name: '信号追踪', desc: '被动技能。敌方使用通讯或技能时，比特会在小地图上看到短暂的位置标记。' },
+                            { name: '系统入侵', desc: '终极技能。入侵敌方指挥系统，使全体敌人小地图显示错误信息，持续12秒，同时暴露敌方所有人员位置。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 4, color: '#e74856' }, { key: '生存能力', val: 4, color: '#4a90d9' },
+                            { key: '机动性', val: 6, color: '#00d4aa' }, { key: '团队辅助', val: 10, color: '#d4a853' },
+                            { key: '上手难度', val: 8, color: '#a855f7' }, { key: '技能强度', val: 9, color: '#f59e0b' },
+                        ],
+                        tips: '比特是团队的信息核心。在烽火地带中，利用侦察无人机先探明前方区域敌情再决定行动路线；在全面战场中，在关键据点附近部署无人机为全队提供持续情报优势。注意保护自己——比特的生存能力较弱。',
+                        image: '工程1.jpg', bgColor: 'linear-gradient(135deg, #0d1a2a, #050d1a)'
+                    },
+                    {
+                        id: 6, realName: '阿列克谢·彼得罗夫', codename: '深蓝', classType: 'engineer', classLabel: '工程',
+                        roleTitle: 'ENGINEER · 水域作战专家', classIcon: 'bi bi-tools',
+                        shortDesc: '作战经验非常丰富，耐力和力量出众，他的全面防护装备是帮助小队推进的利器。有他加入阿萨拉地区的行动，我方伤亡率会大大降低，因为守护每一个人是他的本能。',
+                        longDesc: '阿列克谢·彼得罗夫，代号"深蓝"，是一位作战经验极为丰富的工程专家。他拥有出众的耐力和力量，是队伍中无可替代的防线核心。深蓝的全面防护装备是帮助小队稳步推进的利器——无论是攻坚还是防守，他都能为队友提供可靠的掩护。自他加入阿萨拉地区的行动以来，我方伤亡率大幅降低。对于深蓝来说，守护每一位队友是他的本能，也是他战斗的意义所在。"大海教会我一件事——耐心等待，然后一击致命。"',
+                        abilities: [
+                            { name: '水下潜行', desc: '水下移动速度提升50%且不产生气泡痕迹，氧气容量翻倍，持续60秒。' },
+                            { name: '水下爆破', desc: '在水下或水面目标上安装高爆定时炸弹，可远程引爆，对舰船和桥梁有额外伤害加成。' },
+                            { name: '两栖载具', desc: '被动技能。维修水上载具速度提升100%，驾驶水上载具时载具耐久提升30%。' },
+                            { name: '深水炸弹', desc: '终极技能。向目标水域投放深水炸弹，对水下及水面大范围区域造成毁灭性打击，附带冲击波眩晕效果。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 7, color: '#e74856' }, { key: '生存能力', val: 7, color: '#4a90d9' },
+                            { key: '机动性', val: 5, color: '#00d4aa' }, { key: '团队辅助', val: 7, color: '#d4a853' },
+                            { key: '上手难度', val: 6, color: '#a855f7' }, { key: '技能强度', val: 8, color: '#f59e0b' },
+                        ],
+                        tips: '深蓝在有水域的地图中如鱼得水。在烽火地带中优先选择沿水路的撤离路线，利用水下潜行安全转移；在全面战场中负责反制敌方水上载具。在无水地图中深蓝的战斗力会大打折扣。',
+                        image: '工程2.png', bgColor: 'linear-gradient(135deg, #0a1a2a, #050d1a)'
+                    },
+                    {
+                        id: 7, realName: '泰瑞·缪萨', codename: '牧羊人', classType: 'engineer', classLabel: '工程',
+                        roleTitle: 'ENGINEER · 防线构筑者', classIcon: 'bi bi-tools',
+                        shortDesc: '不光是工程人员，更是团队的粘合剂。他对每个队员都有充分的了解——"关注你的敌人，但更要关注你的朋友。"他的技能以声波控制为核心，进可攻退可守，能为团队提供强大的区域控制和防御能力。',
+                        longDesc: '泰瑞·缪萨，代号"牧羊人"，他不只是一名工程人员，更是整个团队的粘合剂。牧羊人对每一位队员都有着充分的了解，他有一句名言："关注你的敌人，但更要关注你的朋友。"他的技能以声波控制为核心，攻防一体——进可释放震裂声波瓦解敌方阵型，退可构筑能量护盾守护团队阵地。牧羊人温和而坚定，像守护羊群一样守护着他的每一位战友。在战场上，有牧羊人在的地方就是最安全的阵地。',
+                        abilities: [
+                            { name: '哨戒炮台', desc: '部署自动哨戒炮，自动攻击范围内的敌人，持续30秒。可被摧毁，同时只能存在1座。' },
+                            { name: '能量护盾', desc: '展开可移动的能量护盾，阻挡正面火力。护盾耐久值耗尽后需要30秒充能。' },
+                            { name: '维修工具', desc: '被动技能。修理载具和友方工程设备的速度提升100%，靠近时友方载具缓慢回复耐久。' },
+                            { name: '铁壁防线', desc: '终极技能。在目标区域部署重型防御阵地，包括强化哨戒炮、全向护盾和补给站，持续25秒。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 5, color: '#e74856' }, { key: '生存能力', val: 10, color: '#4a90d9' },
+                            { key: '机动性', val: 2, color: '#00d4aa' }, { key: '团队辅助', val: 9, color: '#d4a853' },
+                            { key: '上手难度', val: 4, color: '#a855f7' }, { key: '技能强度', val: 8, color: '#f59e0b' },
+                        ],
+                        tips: '牧羊人最适合防守型打法。在烽火地带中优先在撤离点附近布置哨戒炮；在全面战场中在关键据点部署铁壁防线。注意移动时收起护盾——护盾展开时移动速度极慢。',
+                        image: '工程3.png', bgColor: 'linear-gradient(135deg, #1a1a0d, #0d0d05)'
+                    },
+                    {
+                        id: 8, realName: '大卫·费莱尔', codename: '乌鲁鲁', classType: 'engineer', classLabel: '工程',
+                        roleTitle: 'ENGINEER · 爆破专家', classIcon: 'bi bi-tools',
+                        shortDesc: '技能攻守兼备。"速凝掩体"能在指定位置快速生成混凝土掩体，为队友在开阔地带提供掩护。"复合型燃烧弹"可投掷到掩体或建筑中打击视野盲区，造成灼烧持续伤害，还能烧毁敌方掩体，限制敌人行动路线。',
+                        longDesc: '大卫·费莱尔，代号"乌鲁鲁"，是一位技能攻守兼备的爆破工程专家。他的标志性技能"速凝掩体"可以在指定位置快速生成混凝土掩体，为队友在开阔地带提供即时掩护。而他的"复合型燃烧弹"则可以投掷到掩体或建筑中，有效打击视野盲区内的敌人，造成持续的灼烧伤害。这种燃烧弹还能烧毁敌方掩体，极大地限制了敌人的行动路线。乌鲁鲁的战斗方式简单粗暴——遇到障碍？炸掉。遇到敌人？还是炸掉。"BOOM！哈哈哈哈！"',
+                        abilities: [
+                            { name: 'C4炸药', desc: '放置C4遥控炸药，可粘附在任何表面，远程引爆。最多同时放置3个，爆炸对载具伤害翻倍。' },
+                            { name: '反载具火箭', desc: '发射反载具火箭弹，对载具造成巨量伤害，命中后可追踪目标2秒。' },
+                            { name: '爆破专精', desc: '被动技能。所有爆炸类伤害提升25%，爆炸范围扩大15%。对可破坏场景的破坏力翻倍。' },
+                            { name: '地毯轰炸', desc: '终极技能。呼叫空中支援对目标长方形区域进行地毯式轰炸，持续6秒，对区域内所有单位和建筑造成毁灭性打击。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 10, color: '#e74856' }, { key: '生存能力', val: 5, color: '#4a90d9' },
+                            { key: '机动性', val: 3, color: '#00d4aa' }, { key: '团队辅助', val: 5, color: '#d4a853' },
+                            { key: '上手难度', val: 4, color: '#a855f7' }, { key: '技能强度', val: 10, color: '#f59e0b' },
+                        ],
+                        tips: '乌鲁鲁是摧毁敌方载具和工事的首选。在烽火地带中利用C4炸药在撤离点设伏；在全面战场中优先摧毁敌方载具和牧羊人的防御工事。注意爆破会暴露位置，使用后及时转移。',
+                        image: '工程4.png', bgColor: 'linear-gradient(135deg, #1a0d0d, #0d0505)'
+                    },
+
+                    // ---- 医疗兵 ----
+                    {
+                        id: 9, realName: '罗伊·斯米', codename: '蜂医', classType: 'medic', classLabel: '医疗',
+                        roleTitle: 'MEDIC · 战地急救员', classIcon: 'bi bi-heart-pulse',
+                        shortDesc: '出生于治安混乱的小镇，曾混迹街头，后参军并凭借出色的战场救援功绩晋升为特战干员。他的背景故事带有一丝遗憾——曾因救援不及时而失去战友，从此他的激素枪永远满弹，致力于在战场上挽救每一个队友。',
+                        longDesc: '罗伊·斯米，代号"蜂医"，出生于一个治安混乱的小镇，少年时曾在街头摸爬滚打。参军后，他凭借出色的战场救援功绩一步步晋升为特战干员。蜂医的过往中藏着一道永远无法愈合的伤疤——他曾因救援不及时而失去了一位亲密的战友。从那之后，他的激素枪永远装满了弹药，每一次出击都全力以赴救治每一位倒下的队友。蜂医温柔而坚定，是战场上最值得信赖的生命守护者。"只要我还在，就没有人会在战场上倒下。"',
+                        abilities: [
+                            { name: '急救注射', desc: '向队友注射急救药剂，瞬间恢复50%生命值并无敌0.5秒。充能3层，每层冷却20秒。' },
+                            { name: '治疗无人机', desc: '部署治疗无人机跟随目标队友，持续恢复生命值（每秒3%），持续20秒。' },
+                            { name: '快速救援', desc: '被动技能。救援倒地队友的速度提升60%，救援期间获得30%伤害减免。' },
+                            { name: '生命链接', desc: '终极技能。链接范围内所有队友，任意队友受到伤害的40%由蜂医承担，蜂医每2秒回复5%生命值，持续10秒。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 3, color: '#e74856' }, { key: '生存能力', val: 6, color: '#4a90d9' },
+                            { key: '机动性', val: 7, color: '#00d4aa' }, { key: '团队辅助', val: 10, color: '#d4a853' },
+                            { key: '上手难度', val: 2, color: '#a855f7' }, { key: '技能强度', val: 9, color: '#f59e0b' },
+                        ],
+                        tips: '蜂医是新手入门的最佳选择。在烽火地带中时刻关注队友血量，利用快速救援在交火中救人；在全面战场中保持在队伍中间位置，让生命链接覆盖尽可能多的队友。活着的蜂医才是好蜂医。',
+                        image: '医疗1.png', bgColor: 'linear-gradient(135deg, #0d1a0d, #050d05)'
+                    },
+                    {
+                        id: 10, realName: '佐娅·庞琴科娃', codename: '蛊', classType: 'medic', classLabel: '医疗',
+                        roleTitle: 'MEDIC · 生化专家', classIcon: 'bi bi-heart-pulse',
+                        shortDesc: '出身技术研究领域，战斗热情丝毫不输作战人员。她生于军人家庭，研究项目都围绕辅助作战展开，承接作战任务也极为积极。佐娅能将现代神经化学与智能无人机作战完美融合，是一名独特且令人生畏的支援干员。',
+                        longDesc: '佐娅·庞琴科娃，代号"蛊"，出身于技术研究领域，但她的战斗热情丝毫不输任何一线作战人员。佐娅生于军人家庭，从小耳濡目染的军事氛围让她对战场有着独特的理解。她的所有研究项目都围绕辅助作战展开，承接作战任务也极为积极。佐娅将现代神经化学与智能无人机作战完美融合，创造出了一种独特的战斗辅助体系——既能治愈队友，也能对敌人造成生化威胁。她是一名独特且令人生畏的支援型干员。"良药苦口，而我开的药，特别苦。"',
+                        abilities: [
+                            { name: '治疗毒雾', desc: '投掷特制药瓶，在目标区域形成双效迷雾——队友每秒回复2%生命值，敌人每秒受到2%毒素伤害，持续12秒。' },
+                            { name: '生化弹药', desc: '为当前武器装填生化弹匣，命中敌人后造成持续毒素伤害（每秒1.5%最大生命值），持续5秒，最多叠加3层。' },
+                            { name: '解毒剂', desc: '被动技能。蛊自身免疫所有毒素效果。靠近蛊3米内的队友受到的毒素伤害减半。' },
+                            { name: '瘟疫蔓延', desc: '终极技能。向目标区域释放强化瘟疫，范围内敌人持续受到毒素伤害并传染给附近敌人，持续15秒。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 7, color: '#e74856' }, { key: '生存能力', val: 5, color: '#4a90d9' },
+                            { key: '机动性', val: 4, color: '#00d4aa' }, { key: '团队辅助', val: 8, color: '#d4a853' },
+                            { key: '上手难度', val: 6, color: '#a855f7' }, { key: '技能强度', val: 8, color: '#f59e0b' },
+                        ],
+                        tips: '蛊的特色是"控制大于治疗"。在烽火地带中利用治疗毒雾封锁狭窄通道；在全面战场中在敌人密集处释放瘟疫蔓延瓦解敌方阵型。蛊的治疗能力弱于蜂医，但伤害能力远超其他医疗兵。',
+                        image: '医疗2.png', bgColor: 'linear-gradient(135deg, #1a0d1a, #0d050d)'
+                    },
+                    {
+                        id: 11, realName: '莉娜·范德梅尔', codename: '蝶', classType: 'medic', classLabel: '医疗',
+                        roleTitle: 'MEDIC · 战场舞者', classIcon: 'bi bi-heart-pulse',
+                        shortDesc: '临床医学和药物研究领域的顶尖专家，投身医疗事业的动机源于深刻的个人经历与坚定的利他主义信念。她的技能组围绕"无人机"与"烟雾"展开，适合在攻坚、守点等需要持续续航的场景中发挥优势。',
+                        longDesc: '莉娜·范德梅尔，代号"蝶"，是临床医学和药物研究领域的顶尖专家。她投身医疗事业的动机源于一段深刻的个人经历与坚定不移的利他主义信念。蝶的技能组围绕"无人机"与"烟雾"两大核心展开——她能在敌人火力网中优雅穿梭，为队友送上及时的治疗与守护。在攻坚和守点等需要持续续航的战斗场景中，蝶的优势尤为突出。她的存在让严肃的战场有了一抹轻盈的色彩。"战斗是一支舞，而我从不踩错节拍。"',
+                        abilities: [
+                            { name: '蝶舞步法', desc: '激活后在3秒内连续进行3次快速位移，每次位移后留下持续3秒的治疗残影（经过的队友每秒回复2%HP）。' },
+                            { name: '纳米绷带', desc: '向队友投掷纳米绷带，立即治疗15%生命值并在接下来8秒内提供持续回复（每秒1.5%）。' },
+                            { name: '鼓舞光环', desc: '被动技能。蝶周围15米范围内的队友移动速度提升8%，换弹速度提升12%。' },
+                            { name: '生命绽放', desc: '终极技能。为周围全体队友施加生命绽放效果，持续8秒内免疫一次致命伤害（触发后回复至30%HP）。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 4, color: '#e74856' }, { key: '生存能力', val: 7, color: '#4a90d9' },
+                            { key: '机动性', val: 9, color: '#00d4aa' }, { key: '团队辅助', val: 8, color: '#d4a853' },
+                            { key: '上手难度', val: 5, color: '#a855f7' }, { key: '技能强度', val: 9, color: '#f59e0b' },
+                        ],
+                        tips: '蝶的核心是"机动治疗"。在烽火地带中用蝶舞步法快速穿梭于队友之间；在全面战场中生命绽放的免疫致命伤害效果在关键时刻可以扭转战局。注意鼓舞光环的被动范围，尽量保持在队伍中心。',
+                        image: '医疗3.png', bgColor: 'linear-gradient(135deg, #0d1a1a, #050d0d)'
+                    },
+
+                    // ---- 侦察兵 ----
+                    {
+                        id: 12, realName: '卢克·埃弗利', codename: '回响', classType: 'recon', classLabel: '侦察',
+                        roleTitle: 'RECON · 声波追踪者', classIcon: 'bi bi-eye',
+                        shortDesc: '英国籍的声学情报专家，天生对声音极度敏感。他是一位以声波为核心进行侦察和干扰的专家，能彻底改变战场的信息博弈方式。',
+                        longDesc: '卢克·埃弗利，代号"回响"，是一位英国籍的声学情报专家。他天生对声音拥有超乎常人的敏感度——在其他人眼中嘈杂无序的环境噪音，在他耳中则是清晰的战术信号。回响以声波为核心进行侦察和干扰，能够通过分析战场上的每一个声响来精准定位敌人的位置。他的存在彻底改变了战场的信息博弈方式——敌人还未来得及靠近，就已经被回响锁定。"声音是不会说谎的，而我会听清一切。"',
+                        abilities: [
+                            { name: '声波定位', desc: '激活后在小地图上显示周围敌人发出的声音源位置（枪声、脚步声、技能声），持续10秒。冷却15秒。' },
+                            { name: '超声波脉冲', desc: '发射超声波脉冲扫描前方锥形区域，穿透墙壁标记被扫描到的敌人位置，标记持续3秒。' },
+                            { name: '听觉增强', desc: '被动技能。回响可以听到2倍范围内的敌人脚步声，且能分辨不同兵种的脚步声特征。' },
+                            { name: '震裂声波', desc: '终极技能。释放毁灭性声波冲击，对前方扇形区域内敌人造成伤害并眩晕3秒，被命中敌人8秒内无法使用技能。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 5, color: '#e74856' }, { key: '生存能力', val: 4, color: '#4a90d9' },
+                            { key: '机动性', val: 6, color: '#00d4aa' }, { key: '团队辅助', val: 10, color: '#d4a853' },
+                            { key: '上手难度', val: 5, color: '#a855f7' }, { key: '技能强度', val: 8, color: '#f59e0b' },
+                        ],
+                        tips: '回响是信息战的核心。在烽火地带中利用声波定位判断建筑物内是否有其他玩家；在全面战场中用超声波脉冲穿透墙壁获取据点内敌军部署。带上消音武器——你的枪声也会被敌方回响听到。',
+                        image: '侦察1.png', bgColor: 'linear-gradient(135deg, #0d1a2a, #05101a)'
+                    },
+                    {
+                        id: 13, realName: '麦晓雯', codename: '骇爪', classType: 'recon', classLabel: '侦察',
+                        roleTitle: 'RECON · 网络渗透者', classIcon: 'bi bi-eye',
+                        shortDesc: '顶尖的电子攻防专家，被G.T.I.破例特招，且多次申请前往阿萨拉地区执行任务，个中缘由似乎与她的过去息息相关。她是一位天才黑客，擅长电子攻防和隐蔽行动，通过获取信息来掌控战场。',
+                        longDesc: '麦晓雯，代号"骇爪"，是一位顶尖的电子攻防专家。她被G.T.I.破例特招入伍，此后多次主动申请前往阿萨拉地区执行任务——个中缘由似乎与她的过去有着密切的关联。骇爪是一位不折不扣的天才黑客，擅长电子攻防和隐蔽行动。她通过入侵敌方系统获取关键情报，以信息优势来掌控整个战场的走向。骇爪的能力不在传统的物理侦察上，而是深入敌方的数字神经系统——从通讯频道到电子设备，无一不是她的猎物。"你们的防火墙？我昨天就已经在里面了。"',
+                        abilities: [
+                            { name: '系统劫持', desc: '劫持敌方部署的无人机、哨戒炮或其他电子设备，将其转为己方使用，持续20秒。' },
+                            { name: '信号窃听', desc: '接入敌方通讯频道，持续8秒内显示敌方小队之间的大致通讯内容（以关键词形式展示）。' },
+                            { name: '虚假情报', desc: '被动技能。骇爪在小地图上显示的标记对敌方侦察手段无效化——敌方看到的骇爪位置存在3-8米随机偏移。' },
+                            { name: '全面入侵', desc: '终极技能。对目标区域内所有敌方电子设备进行全面入侵，持续10秒。包括小地图黑屏、电子瞄具偏移、部署设备失效。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 3, color: '#e74856' }, { key: '生存能力', val: 3, color: '#4a90d9' },
+                            { key: '机动性', val: 5, color: '#00d4aa' }, { key: '团队辅助', val: 10, color: '#d4a853' },
+                            { key: '上手难度', val: 10, color: '#a855f7' }, { key: '技能强度', val: 10, color: '#f59e0b' },
+                        ],
+                        tips: '骇爪是高手向干员，需要极深的游戏理解。在烽火地带中利用系统劫持控制敌方防御设备制造混乱；在全面战场中在敌方发起总攻时使用全面入侵瘫痪敌方电子设备。骇爪自身作战能力极弱，务必与突击兵保持近距离。',
+                        image: '侦察2.png', bgColor: 'linear-gradient(135deg, #1a0d2a, #0d051a)'
+                    },
+                    {
+                        id: 14, realName: '金卢娜', codename: '露娜', classType: 'recon', classLabel: '侦察',
+                        roleTitle: 'RECON · 夜战猎手', classIcon: 'bi bi-eye',
+                        shortDesc: '拥有出色侦察能力的特种作战人员。作为前情报官与职业运动员，她在信息收集与分析以及箭术的把控方面无人能出其右，是团队中不可或缺的"眼睛"。',
+                        longDesc: '金卢娜，代号"露娜"，是一位拥有出色侦察能力的特种作战人员。她曾是一名情报官，同时也是一位职业运动员——这段独特的经历赋予了她双重优势：情报官的敏锐洞察力与运动员的超凡体魄。在信息收集与分析方面，她有着近乎直觉般的精准判断；在箭术的把控上，更是无人能出其右。露娜是团队中不可或缺的"眼睛"，她在暗夜和暗光环境中尤为致命，是真正的黑夜主宰者。"黑暗不是我的掩护，黑暗是我狩猎的领域。"',
+                        abilities: [
+                            { name: '夜视系统', desc: '切换热成像/微光增强双模式。热成像可穿透烟雾和植被发现敌人；微光模式在极暗环境下提供清晰视野。无冷却，可随时切换。' },
+                            { name: '闪光弹', desc: '投掷特制闪光弹，爆发出200万坎德拉的强光，使直视范围内的敌人致盲4秒。对装备夜视设备的敌人效果翻倍（8秒）。' },
+                            { name: '月影步法', desc: '被动技能。在暗光环境下（室内、夜间、阴影中），露娜的脚步声降低70%，且不会被敌方被动探测技能发现。' },
+                            { name: '月光标记', desc: '终极技能。发射标记弹命中敌人，被标记的敌人在30秒内始终对全队可见（无视掩体），且受到的所有伤害提升15%。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 8, color: '#e74856' }, { key: '生存能力', val: 5, color: '#4a90d9' },
+                            { key: '机动性', val: 7, color: '#00d4aa' }, { key: '团队辅助', val: 8, color: '#d4a853' },
+                            { key: '上手难度', val: 6, color: '#a855f7' }, { key: '技能强度', val: 7, color: '#f59e0b' },
+                        ],
+                        tips: '露娜的核心优势在夜间和室内地图。在烽火地带中选择夜间时段出击或优先搜索室内建筑；在全面战场中，月光标记是高价值目标的噩梦——优先标记敌方医疗兵和指挥型干员，让全队集火秒杀。',
+                        image: '侦察3.png', bgColor: 'linear-gradient(135deg, #0d0d2a, #05051a)'
+                    },
+                    {
+                        id: 15, realName: '兰登·哈里森', codename: '银翼', classType: 'recon', classLabel: '侦察',
+                        roleTitle: 'RECON · 空中之眼', classIcon: 'bi bi-eye',
+                        shortDesc: '侦察兵种，擅长使用电子信息设备。其猎鹰无人机能够有效追踪视野内所有敌人的位置。战术装备为蜂鸟间谍摄像头，可破解敌方踪迹，获取敌方干员、装备和位置信息，拥有优秀的信息作战和情报获取能力。',
+                        longDesc: '兰登·哈里森，代号"银翼"，是三角洲行动中最顶尖的无人机操作员。他的猎鹰无人机能够有效追踪视野内所有敌人的位置，配合蜂鸟间谍摄像头可以破解敌方踪迹，获取干员身份、装备配置和精确位置信息。银翼在战斗中几乎从不正面交火——他的"武器"是盘旋在敌人头顶的钢铁之翼。他从高空俯瞰整个战场，为队伍提供无与伦比的上帝视角。银翼性格开朗健谈，是队伍中的开心果，但一旦握住无人机操控器就会变得异常专注和冷静。"从空中看，所有的战术都变得一目了然。"',
+                        abilities: [
+                            { name: '侦察无人机群', desc: '同时部署3架微型侦察无人机，在目标区域上空盘旋并实时标记发现的敌人，持续35秒。无人机几乎不可见，但可被击落。' },
+                            { name: '标记扫描', desc: '操控无人机对下方区域进行一次快速扫描，3秒内标记区域内所有敌人（无视掩体），标记持续5秒。' },
+                            { name: '高空视角', desc: '被动技能。银翼操控无人机时自身进入隐蔽状态（趴下并半透明），无人机视野范围扩大30%。' },
+                            { name: '精确打击', desc: '终极技能。指挥无人机群对标记的敌人位置发射精确制导导弹，每架无人机发射一枚，每枚造成范围伤害并击晕目标2秒。' },
+                        ],
+                        attributes: [
+                            { key: '伤害输出', val: 6, color: '#e74856' }, { key: '生存能力', val: 2, color: '#4a90d9' },
+                            { key: '机动性', val: 4, color: '#00d4aa' }, { key: '团队辅助', val: 10, color: '#d4a853' },
+                            { key: '上手难度', val: 7, color: '#a855f7' }, { key: '技能强度', val: 9, color: '#f59e0b' },
+                        ],
+                        tips: '银翼需要找到安全位置后专注操控无人机。在烽火地带中开局先放飞无人机侦察周围环境；在全面战场中保持无人机在战场上空持续巡逻。银翼操控无人机时几乎没有自保能力——务必确保藏身位置安全。',
+                        image: '侦察4.png', bgColor: 'linear-gradient(135deg, #1a1a1a, #0a0a1a)'
+                    },
+                ]);
+
+                const filteredOperators = computed(() => {
+                    if (charFilter.value === 'all') return operators.value;
+                    return operators.value.filter(op => op.classType === charFilter.value);
+                });
+
+
+                // ======== 登录 ========
+                const isLoginMode = ref(true);
+                const showPassword = ref(false);
+                const loginForm = ref({
+                    username: '', password: '', confirmPassword: '', remember: false, agreeTerms: false,
+                });
+                let loginModalInstance = null;
+
+                const openLoginModal = () => {
+                    if (!loginModalInstance) loginModalInstance = new bootstrap.Modal(document.getElementById('loginModal'));
+                    resetLoginForm();
+                    loginModalInstance.show();
+                };
+                const resetLoginForm = () => {
+                    loginForm.value = { username: '', password: '', confirmPassword: '', remember: false, agreeTerms: false };
+                    showPassword.value = false;
+                    isLoginMode.value = true;
+                };
+                const handleLogin = () => {
+                    const f = loginForm.value;
+                    if (!f.username.trim()) { showToast('请输入用户名'); return; }
+                    if (!f.password.trim()) { showToast('请输入密码'); return; }
+                    if (!isLoginMode.value) {
+                        if (f.password !== f.confirmPassword) { showToast('两次输入的密码不一致'); return; }
+                        if (!f.agreeTerms) { showToast('请先同意相关协议'); return; }
+                    }
+                    const action = isLoginMode.value ? '登录' : '注册';
+                    showToast(`${action}成功！欢迎来到三角洲行动，${f.username}！`);
+                    setTimeout(() => { if (loginModalInstance) loginModalInstance.hide(); resetLoginForm(); }, 1500);
+                };
+
+                // ======== 工具 ========
+                const showToast = (msg) => {
+                    const $t = $('#customToast');
+                    $('#toastMessage').text(msg);
+                    $t.fadeIn(300).delay(2000).fadeOut(300);
+                };
+                const imgError = (e, bg) => {
+                    e.target.style.display = 'none';
+                    e.target.parentElement.style.background = bg;
+                };
+                const currentYear = computed(() => new Date().getFullYear());
+
+                return {
+                    currentPage, selectedMode, navigate,
+                    charFilter, operators, filteredOperators,
+                    isLoginMode, showPassword, loginForm, openLoginModal, handleLogin,
+                    showToast, imgError, currentYear,
+                };
+            },
+        }).mount('#app');
+
+        // ==================== jQuery ====================
+        $(function() {
+            $('.navbar-nav .nav-link').on('click', function() {
+                const c = $('#navbarNav');
+                if (c.hasClass('show')) c.collapse('hide');
+            });
+            console.log('%c三角洲行动 %c· 准备就绪',
+                'color:#00d4aa;font-size:18px;font-weight:bold;',
+                'color:#888;font-size:11px;');
+        });
+    </script>
+</body>
+</html>
