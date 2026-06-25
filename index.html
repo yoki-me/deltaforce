@@ -226,6 +226,50 @@
         .operator-class-label { font-size: 0.72rem; letter-spacing: 3px; color: var(--primary); margin-bottom: 10px; text-transform: uppercase; }
         .operator-desc-short { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; }
 
+        /* 轮播 */
+        .operator-carousel { max-width: 900px; margin: 0 auto; position: relative; }
+        .carousel-main { display: flex; align-items: center; gap: 16px; }
+        .carousel-slides { flex: 1; position: relative; min-height: 520px; }
+        .carousel-slide { position: absolute; top: 0; left: 0; width: 100%; }
+        .carousel-slide-inner {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        .carousel-img-wrap { height: 420px; overflow: hidden; position: relative; background: var(--bg-dark); }
+        .carousel-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .carousel-info { padding: 28px 32px; }
+        .carousel-arrow {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(0,212,170,0.1); border: 1px solid var(--primary);
+            color: var(--primary); font-size: 1.2rem; cursor: pointer;
+            transition: var(--transition); display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .carousel-arrow:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(0,212,170,0.4); }
+        .carousel-dots { display: flex; justify-content: center; gap: 10px; margin-top: 24px; }
+        .carousel-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); border: none; cursor: pointer;
+            transition: var(--transition);
+        }
+        .carousel-dot.active { background: var(--primary); box-shadow: 0 0 10px rgba(0,212,170,0.6); transform: scale(1.3); }
+        .carousel-dot:hover { background: rgba(0,212,170,0.5); }
+        .carousel-counter {
+            text-align: center; margin-top: 12px;
+            font-family: 'Rajdhani', sans-serif; font-size: 0.9rem;
+            color: var(--text-secondary); letter-spacing: 2px;
+        }
+        .carousel-fade-enter-active, .carousel-fade-leave-active { transition: opacity 0.6s ease; }
+        .carousel-fade-enter-from, .carousel-fade-leave-to { opacity: 0; }
+
+        @media (max-width: 767px) {
+            .carousel-main { gap: 8px; }
+            .carousel-slides { min-height: 420px; }
+            .carousel-img-wrap { height: 280px; }
+            .carousel-arrow { width: 36px; height: 36px; font-size: 1rem; }
+            .carousel-info { padding: 18px 20px; }
+        }
 
         /* 游戏评价 */
         .reviews-hero {
@@ -539,8 +583,39 @@
                                 <button class="class-filter-btn" :class="{ active: charFilter === 'recon' }" @click="charFilter = 'recon'"><i class="bi bi-eye me-1"></i> 侦察</button>
                             </div>
 
-                            <!-- 干员卡片 -->
-                            <div class="row g-4">
+                            <!-- 全部干员轮播 -->
+                            <div v-if="charFilter === 'all'" class="operator-carousel" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
+                                <div class="carousel-main">
+                                    <button class="carousel-arrow carousel-prev" @click="prevSlide"><i class="bi bi-chevron-left"></i></button>
+                                    <div class="carousel-slides">
+                                        <transition-group name="carousel-fade">
+                                            <div v-for="(op, idx) in operators" :key="op.id" v-show="idx === carouselIndex" class="carousel-slide">
+                                                <div class="carousel-slide-inner">
+                                                    <div class="carousel-img-wrap">
+                                                        <img :src="op.image" :alt="op.codename" @error="imgError($event, op.bgColor)">
+                                                        <div class="operator-img-overlay"></div>
+                                                        <span class="operator-img-badge">{{ op.classLabel }}</span>
+                                                    </div>
+                                                    <div class="carousel-info">
+                                                        <div class="operator-realname">{{ op.realName }}</div>
+                                                        <h4 class="operator-codename">代号：{{ op.codename }}</h4>
+                                                        <div class="operator-class-label">{{ op.roleTitle || op.classLabel }}</div>
+                                                        <p class="operator-desc-short">{{ op.shortDesc }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </transition-group>
+                                    </div>
+                                    <button class="carousel-arrow carousel-next" @click="nextSlide"><i class="bi bi-chevron-right"></i></button>
+                                </div>
+                                <div class="carousel-dots">
+                                    <button v-for="(op, idx) in operators" :key="op.id" :class="['carousel-dot', { active: idx === carouselIndex }]" @click="goToSlide(idx)"></button>
+                                </div>
+                                <div class="carousel-counter">{{ carouselIndex + 1 }} / {{ operators.length }}</div>
+                            </div>
+
+                            <!-- 分类干员静态卡片 -->
+                            <div v-else class="row g-4">
                                 <div class="col-xl-3 col-lg-4 col-md-6" v-for="op in filteredOperators" :key="op.id">
                                     <div class="operator-card">
                                         <div class="operator-img-wrap">
@@ -692,7 +767,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
 
     <script>
-        const { createApp, ref, computed } = Vue;
+        const { createApp, ref, computed, watch, onMounted } = Vue;
 
         createApp({
             setup() {
@@ -711,6 +786,43 @@
 
                 // ======== 角色筛选 ========
                 const charFilter = ref('all');
+
+                // ======== 轮播 ========
+                const carouselIndex = ref(0);
+                let carouselTimer = null;
+                const CAROUSEL_DELAY = 3000;
+
+                const nextSlide = () => {
+                    carouselIndex.value = (carouselIndex.value + 1) % operators.value.length;
+                };
+                const prevSlide = () => {
+                    carouselIndex.value = (carouselIndex.value - 1 + operators.value.length) % operators.value.length;
+                };
+                const goToSlide = (idx) => {
+                    carouselIndex.value = idx;
+                };
+                const startAutoPlay = () => {
+                    if (carouselTimer) clearInterval(carouselTimer);
+                    carouselTimer = setInterval(nextSlide, CAROUSEL_DELAY);
+                };
+                const stopAutoPlay = () => {
+                    if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+                };
+
+                // 监听过滤变化，重置轮播并控制自动播放
+                watch(charFilter, (val) => {
+                    carouselIndex.value = 0;
+                    if (val === 'all') {
+                        startAutoPlay();
+                    } else {
+                        stopAutoPlay();
+                    }
+                });
+
+                // 初始启动自动播放
+                onMounted(() => {
+                    startAutoPlay();
+                });
 
                 // ======== 干员数据（基于干员介绍文件重写） ========
                 const operators = ref([
@@ -1060,6 +1172,7 @@
                 return {
                     currentPage, selectedMode, navigate,
                     charFilter, operators, filteredOperators,
+                    carouselIndex, nextSlide, prevSlide, goToSlide, startAutoPlay, stopAutoPlay,
                     isLoginMode, showPassword, loginForm, openLoginModal, handleLogin,
                     showToast, imgError, currentYear,
                 };
